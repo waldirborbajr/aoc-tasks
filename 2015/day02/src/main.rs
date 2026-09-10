@@ -1,6 +1,8 @@
 use std::fs;
+use std::time::Instant;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let start = Instant::now();
     let input = fs::read_to_string("input.txt")?;
     
     let mut paper = 0;
@@ -18,9 +20,13 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         // Part 2: perimeter of two smallest + volume
         ribbon += 2 * (a + b) + a*b*c;
     }
+
+    let elapsed = start.elapsed();
     
     println!("Part 1: {}", paper);
     println!("Part 2: {}", ribbon);
+    println!(r#"⏱️  Elapsed time: {:?}"#, elapsed);
+
     
     Ok(())
 }
