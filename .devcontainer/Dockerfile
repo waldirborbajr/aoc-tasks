@@ -18,8 +18,13 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
     && ln -s /usr/bin/fdfind /usr/local/bin/fd \
     && ln -s /usr/bin/batcat /usr/local/bin/bat
 
+# Registra os filtros smudge/clean do Git LFS globalmente (/etc/gitconfig),
+# resolvendo o erro "git-lfs was not found on your path" no pre-push hook.
+# Precisa rodar depois de instalar o pacote git-lfs acima.
+RUN git lfs install --system
+
 # Cria os diretórios que serão montados como volume JÁ com o dono certo.
-# É isso que resolve o "permission issues" que te fez tirar o mount do target/.
+# É isso que resolve o "permission issues" do mount do target/.
 RUN mkdir -p /usr/local/cargo/registry /usr/local/cargo/sccache /home/vscode/target-cache \
     && chown -R vscode:vscode /usr/local/cargo/registry /usr/local/cargo/sccache /home/vscode/target-cache
 
