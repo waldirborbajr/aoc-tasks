@@ -20,11 +20,9 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
 
 # Registra os filtros smudge/clean do Git LFS globalmente (/etc/gitconfig),
 # resolvendo o erro "git-lfs was not found on your path" no pre-push hook.
-# Precisa rodar depois de instalar o pacote git-lfs acima.
 RUN git lfs install --system
 
 # Cria os diretórios que serão montados como volume JÁ com o dono certo.
-# É isso que resolve o "permission issues" do mount do target/.
 RUN mkdir -p /usr/local/cargo/registry /usr/local/cargo/sccache /home/vscode/target-cache \
     && chown -R vscode:vscode /usr/local/cargo/registry /usr/local/cargo/sccache /home/vscode/target-cache
 
@@ -41,7 +39,7 @@ RUN curl -L --proto '=https' --tlsv1.2 -sSf \
     | bash
 
 # --disable-strategies compile = FALHA se não achar binário, em vez de compilar
-# escondido. Isso é o que de fato garante "100% binário".
+# escondido. Garante "100% binário" para todo o grupo abaixo.
 RUN cargo binstall -y --locked --disable-strategies compile \
         cargo-nextest \
         cargo-edit \
@@ -57,8 +55,14 @@ RUN cargo binstall -y --locked --disable-strategies compile \
         sccache \
         git-delta \
         just \
-        bacon \
-        taplo-cli
+        bacon
+
+# taplo-cli não publica binário pré-compilado (nem GitHub Releases nem
+# QuickInstall) para esta versão/plataforma — sem --disable-strategies aqui,
+# então o binstall cai para compilar da fonte só para este crate. É rápido
+# (crate pequeno, sem árvore de deps pesada), então não compromete o
+# objetivo de "evitar compilação demorada" do restante do setup.
+RUN cargo binstall -y --locked taplo-cli
 
 # ==========================================
 # 3. Variáveis de ambiente globais
