@@ -1,5 +1,5 @@
 {
-  "name": "Rust Power User",
+  "name": "Rust Power Dev Environment",
   "build": {
     "dockerfile": "Dockerfile"
   },
